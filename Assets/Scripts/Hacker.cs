@@ -1,9 +1,9 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Hacker : MonoBehaviour
 {
     // Game configuration data
+    const string menuHint = "Type 'menu' to return to main menu.";
     string[] level1Passwords = { "password1", "password2", "password3" };
     string[] level2Passwords = { "harderPassword1", "harderPassword2", "harderPassword3" };
     string[] level3Passwords = { "hardestPassword1", "hardestPassword2", "hardestPassword3" };
@@ -14,8 +14,6 @@ public class Hacker : MonoBehaviour
     enum Screen { MainMenu, Password, Win };
     Screen currentScreen;
     string password;
-
-    
 
     // Start is called before the first frame update
     void Start()
@@ -60,43 +58,56 @@ public class Hacker : MonoBehaviour
 
     void RunMainMenu(string input)
     {
-        if (input == "1")
+        bool isValidLevelNumber = (input == "1" || input == "2" || input == "3");
+        
+        if (isValidLevelNumber)
         {
-            level = 1;
-            currentScreen = Screen.Password;
-            password = level1Passwords[0];
-            StartGame(level, password);
-        }
-        else if (input == "2")
-        {
-            level = 2;
-            currentScreen = Screen.Password;
-            password = level2Passwords[0];
-            StartGame(level, password);
-        }
-        else if (input == "3")
-        {
-            level = 3;
-            currentScreen = Screen.Password;
-            password = level3Passwords[0];
-            StartGame(level, password);
+            level = int.Parse(input);
+            AskForPassword();
         }
         else if (input == "007")
         {
             Terminal.WriteLine("Welcome back Mr. Bond.");
+            Terminal.WriteLine(menuHint);
         }
         else
         {
             Terminal.WriteLine("Unrecognized network level.\n");
+            Terminal.WriteLine(menuHint);
         }
     }
 
-    void StartGame(int level, string password)
+    void AskForPassword()
     {
         currentScreen = Screen.Password;
-        Terminal.WriteLine($"You have chosen level {level}.\n");
-        Terminal.WriteLine("Please enter password:\n");
+        Terminal.ClearScreen();
+        SetRandomPassword();
+        Terminal.WriteLine("Enter password. Hint: " + password.Anagram());
+        Terminal.WriteLine(menuHint);
+    }
 
+    void SetRandomPassword()
+    {
+        int passIndex;
+
+        switch (level)
+        {
+            case 1:
+                passIndex = Random.Range(0, level1Passwords.Length);
+                password = level1Passwords[passIndex];
+                break;
+            case 2:
+                passIndex = Random.Range(0, level2Passwords.Length);
+                password = level2Passwords[passIndex];
+                break;
+            case 3:
+                passIndex = Random.Range(0, level3Passwords.Length);
+                password = level3Passwords[passIndex];
+                break;
+            default:
+                Debug.LogError("Invalid Level Number!");
+                break;
+        }
     }
 
     void CheckPassword(string input)
@@ -107,20 +118,59 @@ public class Hacker : MonoBehaviour
         }
         else
         {
-            Terminal.WriteLine("Please try again:");
-            currentScreen = Screen.Password;
+            AskForPassword();
+            Terminal.WriteLine("Sorry, wrong password. Try again.");
         }
     }
 
     void ShowWinScreen()
     {
-        Terminal.WriteLine("Welcome!");
         currentScreen = Screen.Win;
+        Terminal.ClearScreen();
+        ShowLevelReward();
+        Terminal.WriteLine(menuHint);
     }
-    //void ShowWinScreen()
-    //{
-    //    currentScreen = Screen.Win;
-    //    Terminal.WriteLine("ACCESS GRANTED");
-    //}
+
+    void ShowLevelReward()
+    {
+        switch(level)
+        {
+            case 1:
+                Terminal.WriteLine("Suspect Identified!");
+                Terminal.WriteLine(@"
+      ////^\\\\
+      | ^   ^ |
+     @ (o) (o) @
+      |   <   |
+      |  ___  |
+       \_____/"
+                );
+                break;
+            case 2:
+                Terminal.WriteLine("Fighter Jets Deployed!");
+                Terminal.WriteLine(@"
+      \   /            \   /
+ .____-/.\-____.  .____-/.\-____.
+      ~`-'~            ~`-'~
+                           
+                ");
+                break;
+            case 3:
+                Terminal.WriteLine("Blast Off!");
+                Terminal.WriteLine(@" 
+   /\
+  |N |
+  |A |
+  |S |
+  |A |
+ |____|
+  '-`'
+ '-`'-;' 
+;'.;' .;"
+                );
+                break;
+        }
+    }
+
 }
 
