@@ -1,16 +1,21 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Hacker : MonoBehaviour
 {
+    // Game configuration data
+    string[] level1Passwords = { "password1", "password2", "password3" };
+    string[] level2Passwords = { "harderPassword1", "harderPassword2", "harderPassword3" };
+    string[] level3Passwords = { "hardestPassword1", "hardestPassword2", "hardestPassword3" };
+
     // Game state
     int level;
     string admin = "Simon";
     enum Screen { MainMenu, Password, Win };
-    Screen currentScreen = Screen.MainMenu;
+    Screen currentScreen;
+    string password;
 
+    
 
     // Start is called before the first frame update
     void Start()
@@ -31,52 +36,91 @@ public class Hacker : MonoBehaviour
     }
 
 
-    void OnUserInput(string inputString)
+    void OnUserInput(string input)
     {
-        if (inputString == "menu") // can always go direct to main menu
+        if (input == "menu") // can always go direct to main menu
         {
             ShowMainMenu();
             currentScreen = Screen.MainMenu;
         }
-        else
+        else if (currentScreen == Screen.MainMenu)
         {
-            RunMainMenu(inputString);
+            RunMainMenu(input);
         }
-}
+        else if (currentScreen == Screen.Password)
+        {
+            CheckPassword(input);
+        }
+        else if (currentScreen == Screen.Win)
+        {
+            ShowWinScreen();
+        }
+    }
 
-    void RunMainMenu(string inputString)
+
+    void RunMainMenu(string input)
     {
-        if (inputString == "1")
+        if (input == "1")
         {
             level = 1;
-            StartGame(1);
+            currentScreen = Screen.Password;
+            password = level1Passwords[0];
+            StartGame(level, password);
         }
-        else if (inputString == "2")
+        else if (input == "2")
         {
             level = 2;
-            StartGame(2);
+            currentScreen = Screen.Password;
+            password = level2Passwords[0];
+            StartGame(level, password);
         }
-        else if (inputString == "3")
+        else if (input == "3")
         {
             level = 3;
-            StartGame(3);
+            currentScreen = Screen.Password;
+            password = level3Passwords[0];
+            StartGame(level, password);
         }
-        else if (inputString == "007")
+        else if (input == "007")
         {
             Terminal.WriteLine("Welcome back Mr. Bond.");
         }
         else
         {
-            Terminal.WriteLine("Unrecognized network level.\nPlease enter the correct level.\n");
+            Terminal.WriteLine("Unrecognized network level.\n");
         }
     }
 
-    void StartGame(int level)
+    void StartGame(int level, string password)
     {
         currentScreen = Screen.Password;
         Terminal.WriteLine($"You have chosen level {level}.\n");
-        Terminal.WriteLine("Please enter password.\n");
+        Terminal.WriteLine("Please enter password:\n");
+
     }
 
+    void CheckPassword(string input)
+    {
+        if (input == password)
+        {
+            ShowWinScreen();
+        }
+        else
+        {
+            Terminal.WriteLine("Please try again:");
+            currentScreen = Screen.Password;
+        }
+    }
+
+    void ShowWinScreen()
+    {
+        Terminal.WriteLine("Welcome!");
+        currentScreen = Screen.Win;
+    }
+    //void ShowWinScreen()
+    //{
+    //    currentScreen = Screen.Win;
+    //    Terminal.WriteLine("ACCESS GRANTED");
+    //}
 }
 
